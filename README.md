@@ -22,13 +22,13 @@
 
 ```bash
 # Go Modules
-require github.com/cloudbypass/golang-sdk/cloudbypass v0.0.1
+require github.com/cloudbypass/golang-sdk V0.0.1
 ```
 
 ### 用法
 
 ```go
-import "github.com/cloudbypass/golang-sdk/cloudbypass"
+import "github.com/cloudbypass/golang-sdk"
 ```
 
 ### 发起请求
