@@ -51,7 +51,7 @@ import (
 
 func main() {
 	client := cloudbypass.New(cloudbypass.BypassConfig{
-		Apikey: "35dc8b866b6a423caaa5f892b7d71f8b",
+		Apikey: "/* APIKEY */",
 	})
 
 	resp, err := client.R().
@@ -69,6 +69,27 @@ func main() {
 ```
 
 ### 查询余额
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/cloudbypass/golang-sdk/cloudbypass"
+)
+
+func main() {
+	balance, err := cloudbypass.GetBalance( /* APIKEY */)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("Balance:", balance)
+}
+
+```
 
 
 ### 关于重定向问题
