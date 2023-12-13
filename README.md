@@ -68,6 +68,40 @@ func main() {
 }
 ```
 
+### 使用V2
+
+穿云API V2适用于需要通过JS质询验证的网站。例如访问https://etherscan.io/accounts/label/lido，请求示例：
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/cloudbypass/golang-sdk/cloudbypass"
+)
+
+func main() {
+	client := cloudbypass.New(cloudbypass.BypassConfig{
+		Apikey: "/* APIKEY */",
+		Part:   "0",
+		Proxy:  "/* PROXY */",
+	})
+
+	resp, err := client.R().
+		EnableTrace().
+		Get("https://etherscan.io/accounts/label/lido")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(resp.StatusCode(), resp.Header().Get("X-Cb-Status"))
+	fmt.Println(resp.String())
+}
+
+```
+
 ### 查询余额
 
 ```go
