@@ -28,6 +28,7 @@ require github.com/cloudbypass/golang-sdk V0.0.1
 ### 用法
 
 ```go
+// Import package cloudbypass
 import "github.com/cloudbypass/golang-sdk"
 ```
 
