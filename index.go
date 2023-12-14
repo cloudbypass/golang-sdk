@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	resty "github.com/go-resty/resty/v2"
+	"net/http"
 	"net/url"
 	"strings"
 )
@@ -21,22 +22,31 @@ type BypassConfig struct {
 func New(config BypassConfig) *resty.Client {
 	apikey := getEnv("CB_APIKEY", config.Apikey)
 	Proxy := getEnv("CB_PROXY", config.Proxy)
-	ApiHost := getEnv("CB_APIHOST", config.ApiHost)
+	if config.ApiHost == "" {
+		config.ApiHost = "https://api.cloudbypass.com"
+	}
+	ApiHost, err := url.Parse(getEnv("CB_APIHOST", config.ApiHost))
+
+	if err != nil || ApiHost.Host == "" {
+		panic(fmt.Sprintf("ApiHost [%s] is wrong or incomplete, requires a complete URL such as https://api.cloudbypass.com", ApiHost))
+	}
+
+	if ApiHost.Scheme == "" {
+		ApiHost.Scheme = "https"
+	}
 
 	client := resty.New()
 	client.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
-		fmt.Println("Before Request", r.Method, r.URL, r.Header)
+		//fmt.Println("Before Request", r.Method, r.URL, r.Header)
 		Url, _ := url.Parse(r.URL)
 		r.SetHeader("X-Cb-Host", Url.Host)
 		r.SetHeader("X-Cb-Apikey", apikey)
 		if config.Proxy != "" {
 			r.SetHeader("X-Cb-Proxy", Proxy)
 		}
-		if ApiHost != "" {
-			Url.Host = ApiHost
-		} else {
-			Url.Host = "api.cloudbypass.com"
-		}
+		Url.Scheme = ApiHost.Scheme
+		Url.Host = ApiHost.Host
+
 		optionSet := make(map[string]bool)
 		for _, option := range config.Options {
 			optionSet[option] = true
@@ -57,7 +67,7 @@ func New(config BypassConfig) *resty.Client {
 		return nil
 	})
 	client.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
-		fmt.Println("After Response", r.StatusCode(), r.Header())
+		//fmt.Println("After Response", r.StatusCode(), r.Header())
 		if r.Header().Get("X-Cb-Status") != "ok" {
 			// 解析响应体错误为BypassException
 			var bypassException BypassException
@@ -69,6 +79,14 @@ func New(config BypassConfig) *resty.Client {
 		}
 		return nil
 	})
+	client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error {
+		//fmt.Println("RedirectPolicy", req.URL, req.Header)
+		req.Header.Set("X-Cb-Host", req.URL.Host)
+
+		req.URL.Scheme = ApiHost.Scheme
+		req.URL.Host = ApiHost.Host
+		return nil
+	}))
 	return client
 }
 
@@ -84,7 +102,7 @@ func GetBalance(apikey ...string) (int, error) {
 	if resp.StatusCode() != 200 {
 		return 0, fmt.Errorf("status code %d", resp.StatusCode())
 	}
-	// 解析Json获取余额balance
+	// parse response body
 	var bypassInfo BypassInfo
 	err = json.Unmarshal(resp.Body(), &bypassInfo)
 	if err != nil {
