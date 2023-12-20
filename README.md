@@ -71,7 +71,7 @@ func main() {
 
 ### 使用V2
 
-穿云API V2适用于需要通过JS质询验证的网站。例如访问https://etherscan.io/accounts/label/lido，请求示例：
+穿云API V2适用于需要通过JS质询验证的网站。例如访问https://etherscan.io/accounts/label/lido ，请求示例：
 
 ```go
 package main
