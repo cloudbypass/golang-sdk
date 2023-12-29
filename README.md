@@ -130,13 +130,15 @@ func main() {
 
 通过`NewProxy`方法创建穿云代理实例。
 
-+ `Copy` 复制代理实例，使原有代理实例不受影响。
-+ `SetDynamic` 设置为动态代理。
-+ `SetExpire` 设置为时效代理，参数为IP过期时间，单位为秒。
-+ `SetRegion` 设置代理IP地区。
-+ `ClearRegion` 清除代理地区。
-+ `Iterate` 返回一个代理IP迭代器，参数为迭代次数。
-+ `Loop` 返回一个代理IP循环迭代器，参数为实际数量。
++ `Copy()` 复制代理实例，使原有代理实例不受影响。
++ `SetDynamic()` 设置为动态代理。
++ `SetExpire(expire int)` 设置为时效代理，参数为IP过期时间，单位为秒。
++ `SetRegion(region string)` 设置代理IP地区。
++ `String()` 返回代理IP字符串。
++ `StringFormat(format string)` 格式化代理IP，参数为格式化字符串，例如`username:password@gateway`。
++ `SetFormat(format string)` 设置代理IP格式化字符串。
++ `Iterate(count int)` 返回一个代理IP实例迭代器，参数为提取数量。
++ `Loop(count int)` 返回一个代理IP实例循环迭代器，参数为实际数量。
 
 ```go
 package main

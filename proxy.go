@@ -31,6 +31,7 @@ type CloudbypassProxy struct {
 	expire    int
 	sessionId string
 	gateway   string
+	format    string
 }
 
 const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -92,12 +93,6 @@ func (proxy *CloudbypassProxy) SetRegion(region string) *CloudbypassProxy {
 	return proxy
 }
 
-func (proxy *CloudbypassProxy) ClearRegion() *CloudbypassProxy {
-	proxy.region = ""
-	proxy.sessionId = ""
-	return proxy
-}
-
 func (proxy *CloudbypassProxy) GetUsername() string {
 	return proxy.username
 }
@@ -149,7 +144,10 @@ func (proxy *CloudbypassProxy) parseOptions() string {
 }
 
 func (proxy *CloudbypassProxy) String() string {
-	return fmt.Sprintf("%s:%s@%s", proxy.parseOptions(), proxy.password, proxy.gateway)
+	if proxy.format != "" {
+		return proxy.StringFormat(proxy.format)
+	}
+	return proxy.StringFormat("username:password@gateway")
 }
 
 func (proxy *CloudbypassProxy) StringFormat(format string) string {
@@ -164,6 +162,11 @@ func (proxy *CloudbypassProxy) StringFormat(format string) string {
 	return format
 }
 
+func (proxy *CloudbypassProxy) SetFormat(format string) *CloudbypassProxy {
+	proxy.format = format
+	return proxy
+}
+
 // Copy a new proxy
 func (proxy *CloudbypassProxy) Copy() *CloudbypassProxy {
 	return &CloudbypassProxy{
@@ -172,6 +175,7 @@ func (proxy *CloudbypassProxy) Copy() *CloudbypassProxy {
 		region:   proxy.region,
 		expire:   proxy.expire,
 		gateway:  proxy.gateway,
+		format:   proxy.format,
 	}
 }
 
