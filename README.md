@@ -167,7 +167,7 @@ func main() {
 
 	// 批量提取
 	fmt.Println("Extract five 10-minute aging proxies: ")
-	iterator := proxy.SetExpire(60 * 10).SetRegion("US").Iterate(10)
+	iterator := proxy.SetExpire(60 * 10).SetRegion("US").SetFormat("username:password:gateway").Iterate(10)
 	for iterator.HasNext() {
 		fmt.Println(iterator.Next())
 	}
