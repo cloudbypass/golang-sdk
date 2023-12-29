@@ -37,7 +37,6 @@ func New(config BypassConfig) *resty.Client {
 
 	client := resty.New()
 	client.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
-		//fmt.Println("Before Request", r.Method, r.URL, r.Header)
 		Url, _ := url.Parse(r.URL)
 		r.SetHeader("X-Cb-Host", Url.Host)
 		r.SetHeader("X-Cb-Apikey", apikey)
@@ -67,9 +66,7 @@ func New(config BypassConfig) *resty.Client {
 		return nil
 	})
 	client.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
-		//fmt.Println("After Response", r.StatusCode(), r.Header())
 		if r.Header().Get("X-Cb-Status") != "ok" {
-			// 解析响应体错误为BypassException
 			var bypassException BypassException
 			err := json.Unmarshal(r.Body(), &bypassException)
 			if err != nil {
@@ -80,7 +77,6 @@ func New(config BypassConfig) *resty.Client {
 		return nil
 	})
 	client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error {
-		//fmt.Println("RedirectPolicy", req.URL, req.Header)
 		req.Header.Set("X-Cb-Host", req.URL.Host)
 
 		req.URL.Scheme = ApiHost.Scheme
@@ -102,7 +98,6 @@ func GetBalance(apikey ...string) (int, error) {
 	if resp.StatusCode() != 200 {
 		return 0, fmt.Errorf("status code %d", resp.StatusCode())
 	}
-	// parse response body
 	var bypassInfo BypassInfo
 	err = json.Unmarshal(resp.Body(), &bypassInfo)
 	if err != nil {

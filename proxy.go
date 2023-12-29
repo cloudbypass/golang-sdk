@@ -7,6 +7,23 @@ import (
 	"strings"
 )
 
+type Iterator interface {
+	HasNext() bool
+	Next() interface{}
+}
+
+type ProxyIterator struct {
+	proxy *CloudbypassProxy
+	index int
+}
+
+type LoopIterator struct {
+	proxy  *CloudbypassProxy
+	length int
+	index  int
+	pool   []string
+}
+
 type CloudbypassProxy struct {
 	username  string
 	password  string
@@ -113,7 +130,7 @@ func (proxy *CloudbypassProxy) parseOptions() string {
 		proxy.username,
 	}
 	if proxy.region != "" {
-		options = append(options, proxy.region)
+		options = append(options, strings.ReplaceAll(proxy.region, " ", "+"))
 	}
 	expire := proxy.expire
 	if expire > 0 && expire < 5184000 {
@@ -156,4 +173,47 @@ func (proxy *CloudbypassProxy) Copy() *CloudbypassProxy {
 		expire:   proxy.expire,
 		gateway:  proxy.gateway,
 	}
+}
+
+func (proxy *CloudbypassProxy) Iterate(count int) *ProxyIterator {
+	return &ProxyIterator{
+		proxy: proxy,
+		index: count,
+	}
+}
+
+func (iterator *ProxyIterator) HasNext() bool {
+	return iterator.index > 0
+}
+
+func (iterator *ProxyIterator) Next() string {
+	iterator.index--
+	iterator.proxy.sessionId = ""
+	return iterator.proxy.String()
+}
+
+func (proxy *CloudbypassProxy) Loop(count int) *LoopIterator {
+	return &LoopIterator{
+		proxy:  proxy,
+		length: count,
+		pool:   make([]string, count),
+	}
+}
+
+func (iterator *LoopIterator) HasNext() bool {
+	return true
+}
+
+func (iterator *LoopIterator) Next() string {
+	if iterator.index == iterator.length {
+		iterator.index = 0
+	}
+
+	if iterator.pool[iterator.index] == "" {
+		iterator.proxy.sessionId = ""
+		iterator.pool[iterator.index] = iterator.proxy.String()
+	}
+
+	iterator.index++
+	return iterator.pool[iterator.index-1]
 }

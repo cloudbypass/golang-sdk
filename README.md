@@ -126,6 +126,58 @@ func main() {
 
 ```
 
+### 提取代理
+
+通过`NewProxy`方法创建穿云代理实例。
+
++ `Copy` 复制代理实例，使原有代理实例不受影响。
++ `SetDynamic` 设置为动态代理。
++ `SetExpire` 设置为时效代理，参数为IP过期时间，单位为秒。
++ `SetRegion` 设置代理IP地区。
++ `ClearRegion` 清除代理地区。
++ `Iterate` 返回一个代理IP迭代器，参数为迭代次数。
++ `Loop` 返回一个代理IP循环迭代器，参数为实际数量。
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/cloudbypass/golang-sdk/cloudbypass"
+)
+
+func main() {
+	proxy, err := cloudbypass.NewProxy("22792395-res:sizrkqkb")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// 提取动态代理
+	fmt.Println("Extract dynamic proxy: ")
+	fmt.Println(proxy.SetDynamic().String())
+	fmt.Println(proxy.SetRegion("US").String())
+
+	// 提取时效代理并指定地区
+	fmt.Println("Extract proxy with expire and region: ")
+	fmt.Println(proxy.SetExpire(60 * 10).SetRegion("US").String())
+
+	// 批量提取
+	fmt.Println("Extract five 10-minute aging proxies: ")
+	iterator := proxy.SetExpire(60 * 10).SetRegion("US").Iterate(10)
+	for iterator.HasNext() {
+		fmt.Println(iterator.Next())
+	}
+
+	// 循环提取
+	fmt.Println("Loop two 10-minute aging proxies: ")
+	loop := proxy.SetExpire(60 * 10).SetRegion("US").Loop(2)
+	for i := 0; i < 10; i++ {
+		fmt.Println(loop.Next())
+	}
+}
+```
 
 ### 关于重定向问题
 
