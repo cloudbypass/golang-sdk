@@ -147,7 +147,7 @@ import (
 )
 
 func main() {
-	proxy, err := cloudbypass.NewProxy("22792395-res:sizrkqkb")
+	proxy, err := cloudbypass.NewProxy("12345678-res:password")
 
 	if err != nil {
 		fmt.Println(err)
