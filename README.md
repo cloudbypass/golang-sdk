@@ -21,8 +21,8 @@
 ### 安装
 
 ```bash
-# Go Modules
-require github.com/cloudbypass/golang-sdk V0.0.1
+// Go Modules
+require github.com/cloudbypass/golang-sdk latest
 ```
 
 ### 用法
