@@ -29,7 +29,7 @@ require github.com/cloudbypass/golang-sdk latest
 
 ```go
 // Import package cloudbypass
-import "github.com/cloudbypass/golang-sdk"
+import cloudbypass "github.com/cloudbypass/golang-sdk"
 ```
 
 ### 发起请求
@@ -47,7 +47,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/cloudbypass/golang-sdk/cloudbypass"
+	cloudbypass "github.com/cloudbypass/golang-sdk"
 )
 
 func main() {
@@ -78,7 +78,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/cloudbypass/golang-sdk/cloudbypass"
+	cloudbypass "github.com/cloudbypass/golang-sdk"
 )
 
 func main() {
@@ -110,7 +110,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/cloudbypass/golang-sdk/cloudbypass"
+	cloudbypass "github.com/cloudbypass/golang-sdk"
 )
 
 func main() {
@@ -145,7 +145,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/cloudbypass/golang-sdk/cloudbypass"
+	cloudbypass "github.com/cloudbypass/golang-sdk"
 )
 
 func main() {
