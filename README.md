@@ -105,6 +105,8 @@ func main() {
 
 ### 查询余额
 
+使用`GetBalance`方法可以查询当前账户余额。
+
 ```go
 package main
 
