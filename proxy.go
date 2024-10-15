@@ -133,7 +133,7 @@ func (proxy *CloudbypassProxy) parseOptions() string {
 			{60, "s"}, {60, "m"}, {24, "h"}, {999, "d"},
 		} {
 			if expire < unit[0].(int) || expire%unit[0].(int) != 0 {
-				options = append(options, fmt.Sprintf("%s-%d%s", proxy.GetSessionId(), expire, unit[1]))
+				options = append(options, fmt.Sprintf("s%s-%d%s", proxy.GetSessionId(), expire, unit[1]))
 				break
 			}
 			expire = expire / unit[0].(int)
