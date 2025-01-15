@@ -15,13 +15,14 @@ type BypassConfig struct {
 	Apikey  string
 	Proxy   string
 	ApiHost string
+	UseV2   bool
 	Part    string
 	Options []string
 }
 
 func New(config BypassConfig) *resty.Client {
 	apikey := getEnv("CB_APIKEY", config.Apikey)
-	Proxy := getEnv("CB_PROXY", config.Proxy)
+	proxy := getEnv("CB_PROXY", config.Proxy)
 	if config.ApiHost == "" {
 		config.ApiHost = "https://api.cloudbypass.com"
 	}
@@ -40,8 +41,10 @@ func New(config BypassConfig) *resty.Client {
 		Url, _ := url.Parse(r.URL)
 		r.SetHeader("X-Cb-Host", Url.Host)
 		r.SetHeader("X-Cb-Apikey", apikey)
-		if config.Proxy != "" {
-			r.SetHeader("X-Cb-Proxy", Proxy)
+		if config.Proxy == "" {
+			r.SetHeader("X-Cb-Proxy", proxy)
+		} else {
+			r.SetHeader("X-Cb-Proxy", config.Proxy)
 		}
 		Url.Scheme = ApiHost.Scheme
 		Url.Host = ApiHost.Host
@@ -61,6 +64,9 @@ func New(config BypassConfig) *resty.Client {
 		if config.Part != "" {
 			r.SetHeader("X-Cb-Version", "2")
 			r.SetHeader("X-Cb-Part", config.Part)
+		}
+		if config.UseV2 {
+			r.SetHeader("X-Cb-Version", "2")
 		}
 		r.URL = Url.String()
 		return nil

@@ -82,10 +82,43 @@ import (
 )
 
 func main() {
+	// Cookie模式：服务端返回加密Cookie，下次请求时由客户端发送验证Cookie
 	client := cloudbypass.New(cloudbypass.BypassConfig{
 		Apikey: "/* APIKEY */",
-		Part:   "0",
 		Proxy:  "/* PROXY */",
+		UseV2:  true,
+	})
+
+	resp, err := client.R().
+		EnableTrace().
+		Get("https://etherscan.io/accounts/label/lido")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(resp.StatusCode(), resp.Header().Get("X-Cb-Status"))
+	fmt.Println(resp.Header().Get("set-cookie"))
+	fmt.Println(resp.String())
+}
+
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	cloudbypass "github.com/cloudbypass/golang-sdk"
+)
+
+func main() {
+	// Part模式：由服务端管理验证Cookie，客户端只需要控制part参数
+	client := cloudbypass.New(cloudbypass.BypassConfig{
+		Apikey: "/* APIKEY */",
+		Proxy:  "/* PROXY */",
+		Part:   "0",
 	})
 
 	resp, err := client.R().
