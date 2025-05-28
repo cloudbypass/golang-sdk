@@ -96,8 +96,8 @@ type BypassInfo struct {
 	Balance int `json:"balance"`
 }
 
-func GetBalance(apikey ...string) (int, error) {
-	resp, err := resty.New().R().Get("https://console.cloudbypass.com/api/v1/balance?apikey=" + getEnv("CB_APIKEY", strings.Join(apikey, "")))
+func GetBalance(apikey string, email string) (int, error) {
+	resp, err := resty.New().R().Get("https://console.cloudbypass.com/api/v1/balance?apikey=" + getEnv("CB_APIKEY", apikey) + "&email=" + email)
 	if err != nil {
 		return 0, err
 	}
