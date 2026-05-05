@@ -92,22 +92,38 @@ func New(config BypassConfig) *resty.Client {
 	return client
 }
 
-type BypassInfo struct {
-	Balance int `json:"balance"`
+const balanceAPIURL = "https://console.cloudbypass.com/api/v1/balance"
+
+// BalanceResult is the JSON response from the balance API.
+// Total is present for traffic types (BalanceTypeRes / BalanceTypeDat).
+type BalanceResult struct {
+	Total   *float64 `json:"total,omitempty"`
+	Balance float64  `json:"balance"`
 }
 
-func GetBalance(apikey string, email string) (int, error) {
-	resp, err := resty.New().R().Get("https://console.cloudbypass.com/api/v1/balance?apikey=" + getEnv("CB_APIKEY", apikey) + "&email=" + email)
+// GetBalance calls POST /api/v1/balance with JSON body. typ is BalanceTypePoints (default if empty), BalanceTypeRes, or BalanceTypeDat.
+func GetBalance(apikey string, email string, typ string) (*BalanceResult, error) {
+	if typ == "" {
+		typ = BalanceTypePoints
+	}
+	key := getEnv("CB_APIKEY", apikey)
+	resp, err := resty.New().R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(map[string]string{
+			"apikey": key,
+			"email":  email,
+			"type":   typ,
+		}).
+		Post(balanceAPIURL)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if resp.StatusCode() != 200 {
-		return 0, fmt.Errorf("status code %d", resp.StatusCode())
+		return nil, fmt.Errorf("status code %d: %s", resp.StatusCode(), string(resp.Body()))
 	}
-	var bypassInfo BypassInfo
-	err = json.Unmarshal(resp.Body(), &bypassInfo)
-	if err != nil {
-		return 0, err
+	var out BalanceResult
+	if err := json.Unmarshal(resp.Body(), &out); err != nil {
+		return nil, err
 	}
-	return bypassInfo.Balance, nil
+	return &out, nil
 }
